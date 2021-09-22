@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <form id="personform">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group row mt-3">
+            <label class="col-sm-2 col-form-label">
+                <strong>{{field.label}}</strong>
+            </label>
+            <div class="col-sm-10">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="form-group row">
+            <input type="submit" class="btn btn-primary" value="Create Person" />
+        </div>
+    </form>
+</div>
+
+
+<div class="container">
+    <table class="table table-bordered d-none" id="showdata">
+        <thead>
+            <tr>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Date of Birth</th>
+                <th scope="col">City</th>
+            </tr>
+        </thead>
+        <tbody id="data">
+            
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $('#personform').submit(function (e) {
+        e.preventDefault();
+        var serializedData = $(this).serialize();   // get the form data
+        $.ajax({
+            method: 'POST',
+            url: "{% url 'demo:postParticipant' %}",
+            data: serializedData,
+            success: function (response) {
+                debugger
+                $('#showdata').removeClass('d-none')
+                document.querySelector("#personform").reset(); // resets form data
+                $('#showdata tbody').empty()    //clear content in table
+                // var instance = JSON.parse(response["instance"]);
+                var instance = response["instance"];
+                // var fields = instance[0]["fields"];
+                for (i = 0; i < instance.length; i++) {
+                    var data = `<tr>
+                            <td>${instance[i].first_name || ""}</td>
+                            <td>${instance[i].last_name || ""}</td>
+                            <td>${instance[i].email || ""}</td>
+                            <td>${instance[i].dob|| ""}</td>
+                            <td>${instance[i].city || ""}</td>
+                        </tr>`
+                    $('#data').append(data)
+                }
+            }
+
+        });
+    });
+
+</script>
+
+{% endblock content %}

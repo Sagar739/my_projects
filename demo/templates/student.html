@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Student Data</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="data:;base64,=">
+    <!-- <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style> -->
+</head>
+
+<body>
+    <form id="student-form" name="student">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group row mt-2 ml-1">
+            <label for="s_no" class="col-sm-2 col-form-label"> {{field.label}} </label>
+            <div class="col-sm-2">
+                {{field}}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="form-group row offset-2">
+            <button type="submit" id="btn_submit" class="btn btn-primary ml-3">Submit</button>
+        </div>
+        <div class="form-group row offset-2">
+            <select class="form-control col-sm-2" id="id_student">
+                <option>Select S_Num</option>
+                {% for s in s_data %}
+                <option value="{{ s.id }}">{{s.s_no}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <div class="container">
+        <table class="table table-bordered d-none" id="showdata">
+            <thead>
+                <tr>
+                    <th scope="col">Student Number</th>
+                    <th scope="col">Student Name</th>
+                    <th scope="col">Student Percentage</th>
+                </tr>
+            </thead>
+            <tbody id="sdata">
+
+            </tbody>
+        </table>
+    </div>
+
+
+    <script>
+        $('#student-form').submit(function (e) {
+            e.preventDefault()
+            var Data = $(this).serialize()
+            $.ajax({
+                url: "{% url 'demo:student_data' %}",
+                method: 'POST',
+                data: Data,
+                success: function (response) {
+               
+                    // console.log(response)
+                    document.querySelector("#student-form").reset();
+                    // $('#showdata').removeClass('d-none')
+                    // $('#showdata tbody').empty()
+                }
+            });
+        });
+        $('#id_student').on("change", function () {
+            debugger
+            $('#showdata').removeClass('d-none')
+            // var getdata = $('#id_student').val()
+            var s_Data = $("#id_selected option:selected").text();
+            console.log(s_Data)
+        });
+    </script>
+
+</body>
